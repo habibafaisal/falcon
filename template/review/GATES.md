@@ -42,12 +42,12 @@ Data the verifier reads, not script logic. Fill in per repo.
 
 These attach to **decision types, not files**. Each needs an explicit, recorded human decision:
 
-- money formula (anything that changes an amount)
+- critical formula (anything that changes an amount, dose, score, or other decided-on value)
 - workflow state transition (what states a record may move between)
 - promotion on either axis
 - tenant boundary
 - which document/system wins on conflict
-- irreversible external action (emails, payments, filings, deletions)
+- irreversible external action (emails, payments, filings, deletions, deploys)
 - accepting an open hazard
 
 ## Intent sources

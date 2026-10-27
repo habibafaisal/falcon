@@ -4,7 +4,7 @@ A short, durable log of mistakes that **recurred**, why they keep happening, and
 them. Add an entry the second time a mistake happens; one-offs live in `review/escapes/`.
 
 Read the index, then open only the entries that match the work. The entries below are **seeds** —
-mistake classes that recur on most money-critical codebases. Keep the ones that bite you, delete the rest.
+mistake classes that recur on most careful codebases. Keep the ones that bite you, delete the rest.
 
 | # | Mistake | Trips when you… |
 |---|---|---|

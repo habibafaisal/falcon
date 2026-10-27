@@ -6,7 +6,7 @@ accepted. Accepting an open hazard is a human decision (see GATES.md).
 
 | id | hazard | found by (cmd or `judgment`) | limited by | blocks |
 |---|---|---|---|---|
-| H1 | float math in a money path | `<grep cmd>` | <e.g. integer-cents policy> | <e.g. permitted_use ≥ historical_backtest> |
+| H1 | float math where exact values are required (money, quantities) | `<grep cmd>` | <e.g. integer-cents policy> | <e.g. permitted_use ≥ historical_backtest> |
 | H2 | module-level mutable state on a control path | `<grep cmd>` | | |
 | H3 | dependency lockfile drift | `<check cmd>` | | |
 | H4 | shared-data query missing its tenant filter | `<scan cmd>` or `judgment` | | |

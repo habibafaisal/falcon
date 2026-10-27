@@ -1,13 +1,19 @@
 # Falcon
 
-A Claude Code harness for codebases where a silent bug costs money: payments, ledgers, lending,
-anything audited.
+A Claude Code harness for careful projects: codebases where a **silent** bug is expensive, the kind
+that passes its own tests and is wrong anyway.
 
-Extracted from building a live money-movement platform with Claude Code. It assumes you already use
-general practices (spec, plan, test-first, worktrees, code review) and adds what those don't catch:
+That covers money (payments, ledgers, billing), health (dosing, records), security (auth,
+permissions), data (pipelines, migrations, analytics people decide on), infrastructure (deploys,
+deletes), and anything audited or regulated.
 
-1. **Risk-tiered ownership.** Work is tiered by what a silent bug would cost. Money, identity, and audit
-   code is UNDERSTAND-IT: the human hears the design one concept at a time and ratifies it.
+Falcon was extracted from building a live money-movement platform with Claude Code, so its case studies
+are about money. The mechanism isn't. It assumes you already use general practices (spec, plan,
+test-first, worktrees, code review) and adds what those don't catch:
+
+1. **Risk-tiered ownership.** Work is tiered by what a silent bug would corrupt, not by how hard it
+   looks. Critical code is UNDERSTAND-IT: the human hears the design one concept at a time and ratifies
+   it. You pick the triggers for your domain.
 2. **Graded evidence, independent review.** Nothing is "done". The builder never verifies its own work,
    and a test only counts once it's been seen failing with its guard broken.
 3. **Misses become checks.** Every miss a human catches becomes an escape record plus an enforced check
@@ -16,6 +22,21 @@ general practices (spec, plan, test-first, worktrees, code review) and adds what
 
 Read [`METHOD.md`](METHOD.md) for the loops, and [`examples/case-studies/`](examples/case-studies/) for six
 real misses that produced checks.
+
+## Pick your triggers
+
+The UNDERSTAND-IT tier is a set of *triggers*: kinds of change where a silent bug corrupts something
+that matters. Five categories cover most careful projects:
+
+| Trigger | Money platform | Health | Auth / security | Data pipeline | Infra |
+|---|---|---|---|---|---|
+| **Critical computation** | ledger splits, interest | dosage, risk scores | — | metrics people decide on | capacity limits |
+| **Identity** | customer dedup keys | patient record matching | user/tenant resolution | join and dedup keys | resource naming |
+| **Integrity / trust** | audit hash chain | consent and access log | permission checks, token validation | lineage, schema contracts | IAM policy |
+| **Exactly-once / determinism** | pay once on retry | order once | session revocation | idempotent loads, reproducible runs | idempotent apply |
+| **Irreversible actions** | send money | notify a patient | delete an account | drop a table | destroy a resource |
+
+Write yours into the tier table in `CLAUDE.md` and the paths into `.claude/protected_paths.txt`.
 
 ## What's in the box
 
@@ -46,8 +67,8 @@ git clone https://github.com/habibafaisal/falcon.git
 
 Then:
 1. Fill in `CLAUDE.md` and adapt the ownership table to your domain.
-2. List your money, identity, and audit paths in `.claude/protected_paths.txt`, each with what a delegate
-   could silently break there.
+2. List your UNDERSTAND-IT paths in `.claude/protected_paths.txt`, each with what a delegate could
+   silently break there.
 3. Set `source_dir` and `test_command` in `review/falcon.toml`, and name your source of truth in
    `review/GATES.md`.
 4. `pip install pyyaml` (plus `tomli` on Python < 3.11).
@@ -57,7 +78,7 @@ Then:
 | When | Do |
 |---|---|
 | Orienting | Ask the `oracle` agent before reading files |
-| Before money/identity work | Walk the design with the owner and record an ADR |
+| Before UNDERSTAND-IT work | Walk the design with the owner and record an ADR |
 | After building | `python review/verify.py <slug>`, then "review this capability" (fresh agent) |
 | Before promoting a capability | "sweep <slug>": prove the tests go red under mutation |
 | Owner catches a miss | "record an escape", then add the new check in the same session |

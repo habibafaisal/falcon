@@ -11,7 +11,7 @@ the claim is true or false, say so — that is a finding.
 
 **Single source of truth — read this first.** The capability file copies no rulings; it only
 points at them. For every `authority` pointer, open the source and re-read it *live* right now —
-never trust a remembered claim. The authority for meaning, money and rulings is named in
+never trust a remembered claim. The authority for meaning, critical values and rulings is named in
 `review/GATES.md` → "Intent sources"; check its override/reconciliation log before trusting an older
 doc. Only where that authority is genuinely silent (pure mechanics — hash bytes, DB wiring) does the
 executable contract stand as the source. **A pointer that no longer resolves — heading gone, ruling
@@ -30,7 +30,7 @@ retired, overridden — is itself a finding**, not a footnote.
 - If wired live today, could the code do more than its permitted_use allows?
 
 ### 3. Architecture
-- Isolation on every path? Float in money paths? Controls that survive a restart?
+- Isolation on every path? Float where exact values are required? Controls that survive a restart?
   Safe under retry/replay? Dependencies pinned? Partial writes contained?
 - What was never built that this use needs? Absence fails no test — hunt for it.
 

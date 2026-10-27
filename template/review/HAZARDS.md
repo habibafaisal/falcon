@@ -10,7 +10,7 @@ never `[PASS]` (CASE-05).
 
 | id | hazard | found by | limited by | blocks |
 |---|---|---|---|---|
-| H1 | float math in a money path | `grep -rnE "float\(" app/ --include=*.py` | integer cents / Decimal policy | permitted_use ≥ shadow_mode |
+| H1 | float math where exact values are required (money, quantities) | `grep -rnE "float\(" app/ --include=*.py` | integer cents / Decimal policy | permitted_use ≥ shadow_mode |
 | H2 | module-level mutable state on a control path | judgment | | |
 | H3 | dependency lockfile drift | `git status --porcelain -- uv.lock package-lock.json` | | |
 | H4 | shared-data query missing its tenant filter | judgment | | |
@@ -18,6 +18,6 @@ never `[PASS]` (CASE-05).
 | H6 | same-origin evidence presented as independent | verify.py same-origin check (WARN) | auto-downgrade to class 4 | |
 | H7 | external client tested only through a wholesale fake (P3) | judgment — for each `Fake<Vendor>` in tests, a real-client payload test exists | | permitted_use ≥ human_approved_live |
 | H8 | mutation probe reverted with `git checkout/restore/reset` on an uncommitted file — deletes the whole uncommitted build | judgment — snapshot with `cp` first, restore with `cp` back; or commit before probing | no_stash_while_live hook (partial) | |
-| H9 | a money effect added to one door but not its twins (P4) | judgment | | |
+| H9 | an effect added to one door but not its twins (P4) | judgment | | |
 
 Replace the H1/H3 commands with your stack's; delete rows that don't apply.

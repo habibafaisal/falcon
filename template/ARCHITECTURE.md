@@ -13,8 +13,8 @@ Mark UNDERSTAND-IT packages with 🔵 — they should match `.claude/protected_p
 
 ## Flows
 
-<The two or three paths money, identity, or data take through the system, step by step.>
+<The two or three paths critical data takes through the system, step by step.>
 
 ## Things that must stay in sync (the drift checklist)
 
-1. <e.g. a new money effect on the webhook ⇒ the same effect on the sweep (SCENARIOS P4)>
+1. <e.g. a new effect on the webhook ⇒ the same effect on the scheduled sweep (SCENARIOS P4)>

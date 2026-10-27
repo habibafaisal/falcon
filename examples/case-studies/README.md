@@ -1,6 +1,8 @@
 # Case studies — misses that became checks
 
-Sanitized escapes from the money-movement platform Falcon was extracted from. Client names, vendors,
+Sanitized escapes from the money-movement platform Falcon was extracted from. The domain is money; each
+failure class (tests agreeing with wrong code, forgiving fakes, twin doors, a lying verifier) shows up
+in any careful project. Client names, vendors,
 code paths and amounts are removed or replaced with illustrative numbers; the failure mechanism is
 unchanged. Each one: what happened → why every automated layer missed it → the check that exists now.
 

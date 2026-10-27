@@ -11,7 +11,7 @@ only the rules the work trips.
 |---|---|---|
 | W1 | Verify absence from every angle before building **or delegating** | say "X is missing" |
 | W2 | Read the code, not the spec or memory, for built behaviour | describe how X behaves |
-| W3 | Ask the failure-window question first | touch money / identity / sealing |
+| W3 | Ask the failure-window question first | touch an UNDERSTAND-IT trigger |
 | W4 | Verify every number you cite | quote a count, amount, or status |
 | W5 | Main session discusses; fresh agents execute and review | hand off work |
 | W6 | A delegate STUBS an UNDERSTAND-IT surface, never builds it | scope a subagent |
@@ -32,10 +32,10 @@ verification.** (mistakes M1)
 
 ## W2 — Read the code for built behaviour
 Specs describe intent; code describes reality. For "how does X behave", open the code and cite
-`file::symbol`. Asserting a money path's behaviour from memory has been wrong before.
+`file::symbol`. Asserting a critical path's behaviour from memory has been wrong before.
 
 ## W3 — The failure-window question
-For any money / identity / sealing change, ask first: *what state is left if the process dies between
+For any UNDERSTAND-IT change, ask first: *what state is left if the process dies between
 these two steps, and what resumes it?* Name the window before designing the fix.
 
 ## W4 — Verify every number
@@ -46,7 +46,7 @@ The main thread holds decisions and conclusions; exploration and review go to fr
 file dumps stay out of context and their judgement isn't anchored by the builder's.
 
 ## W6 — Delegates stub UNDERSTAND-IT surfaces
-A subagent may write the scaffold and tests around a money/identity/audit path, but the owner reviews and
+A subagent may write the scaffold and tests around an UNDERSTAND-IT path, but the owner reviews and
 lands the core. `.claude/hooks/protect_paths.py` enforces this for paths in `.claude/protected_paths.txt`.
 
 ## W7 — Name the DB before destructive SQL
@@ -58,7 +58,7 @@ checkout, commit by explicit path (`git commit -- <files>`), never `git commit -
 with `git checkout <file>` on uncommitted work. (mistakes M5)
 
 ## W9 — Irrevocable = ask first
-Payments, account/resource creation, emails, deletes on external systems, deploys: explicit yes from the
+Payments, notifications, account/resource creation, deletes, deploys, migrations on shared data: explicit yes from the
 owner for *that* action, at the time. Log what was created and how to clean it up. (mistakes M7)
 
 ## W10 — The guard ladder

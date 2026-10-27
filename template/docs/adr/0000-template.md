@@ -1,7 +1,7 @@
 # NNNN — <title>
 
 - **Status:** Proposed | Ratified by <owner>, <date> | Superseded by NNNN
-- **Tier:** delegate | UNDERSTAND-IT (money / identity / audit / determinism)
+- **Tier:** delegate | UNDERSTAND-IT (which trigger)
 
 ## Context
 What forces the decision. Link the authority (spec, ruling) by path + heading, never a pasted quote.

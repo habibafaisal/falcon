@@ -14,7 +14,7 @@ spends time on judgment calls.
 **Four lenses** — every review checks all four:
 1. **Intent** — right business problem? Point at the single source of truth and re-read it live.
 2. **Behavior** — does the code produce the intended result?
-3. **Architecture** — safe under real conditions (isolation, money math, durability, retries)?
+3. **Architecture** — safe under real conditions (isolation, exact arithmetic, durability, retries)?
 4. **Operations** — can it be stopped, watched, and recovered?
 
 **Nothing is ever "done".** A verdict states two things:
@@ -28,7 +28,7 @@ What each promotion needs lives in `review/GATES.md` as data.
 | Class | Evidence |
 |---|---|
 | 0 | matches outside reality (actuals, an authority ruling) |
-| 1 | an invariant holds (money conserved, replay byte-identical) |
+| 1 | an invariant holds (totals conserved, replay byte-identical) |
 | 2 | independently written fixture agrees |
 | 3 | test survives a mutation probe (see the `sweep` operation) |
 | 4 | test written in the same commit/session as the code |
@@ -50,7 +50,7 @@ Templates live in this skill directory under `templates/` and `agents/capability
 1. Create `review/` with `capabilities/` and `escapes/` subdirectories.
 2. Copy `templates/GATES.md`, `templates/HAZARDS.md`, `templates/SCENARIOS.md` into `review/`.
 3. Ask the user for the **single source of truth** — the one authority that overrides on
-   meaning/money/rulings (e.g. a product spec, a domain expert's rulings log), and the executable
+   meaning/critical values/rulings (e.g. a product spec, a domain expert's rulings log), and the executable
    contract that stands only where that authority is silent (e.g. `spec/`, an OpenAPI file). Write both paths into GATES.md.
 4. If `review/verify.py` is missing, copy it from Falcon's template and set `source_dir` and
    `test_command` in `review/falcon.toml`. Its one rule: only verify.py may set `executed:`.
@@ -77,7 +77,7 @@ Templates live in this skill directory under `templates/` and `agents/capability
 
 Green tests only prove "trusted green" if you have shown the suite goes RED when the guard
 is actually broken. This mode does that on a schedule the human triggers — never a cron, never
-an autonomous run against money/audit code. A capability records the probe in its frontmatter:
+an autonomous run against UNDERSTAND-IT code. A capability records the probe in its frontmatter:
 
 ```yaml
 red_ability:
@@ -86,7 +86,7 @@ red_ability:
   mutation: "<file> — <the exact one-line weakening> → <which tests go RED, and the failure mode>"
 ```
 
-Run by a **fresh agent the human starts** (weekly, or before promoting a money/audit capability):
+Run by a **fresh agent the human starts** (weekly, or before promoting an UNDERSTAND-IT capability):
 
 1. Pick the capability (or sweep every `red_ability.status: proven` file that is stale by the
    human's cadence). Read its `red_ability.mutation` — that string IS the recipe.

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """PreToolUse guard — a DELEGATED subagent may not write UNDERSTAND-IT code.
 
-The working agreement (CLAUDE.md) marks a trigger set as UNDERSTAND-IT: code where a silent bug moves
-money wrongly, merges two real identities, forges the audit trail, or breaks determinism. That code is
+The working agreement (CLAUDE.md) marks a trigger set as UNDERSTAND-IT: code where a silent bug
+corrupts a critical computation, merges two real identities, fakes an integrity check, or applies an
+effect twice. That code is
 built WITH the owner's understanding, never silently by a delegate. This hook makes the prose rule
 MECHANICAL: a subagent's Write/Edit to a protected path is denied at the tool boundary; the main
 session (the owner's own work) is never touched.
@@ -13,7 +14,7 @@ subagent. No `agent_id` => main session => always allow. Zero friction for the o
 Protected paths live in `.claude/protected_paths.txt`, one per line, each with its NAMED INVALIDATION
 as a trailing comment. A trailing "/" protects a directory prefix; otherwise an exact file. The
 inclusion test is not "this path is important" — it is: could a delegate editing this path change
-MONEY CORRECTNESS, IDENTITY, AUDIT TRUTH, DETERMINISM, or the CERTIFICATION BOUNDARY? If you can't name
+CRITICAL COMPUTATION, IDENTITY, INTEGRITY, EXACTLY-ONCE/DETERMINISM, or the CERTIFICATION BOUNDARY? If you can't name
 the invalidation, the path doesn't belong (otherwise the fence creeps and starves delegated work).
 
 Turning it off: set `FALCON_FENCE=off` in the environment, or empty the paths file. Record WHY in

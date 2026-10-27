@@ -1,8 +1,12 @@
 # The Falcon method
 
 General-purpose agent harnesses make code match its spec: plan, test-first, review, worktrees. On a
-money system that isn't enough. Code that is correct by its own tests can still be wrong about money,
-because the same agent wrote the reading of the spec, the test, and the code.
+careful project that isn't enough. Code that is correct by its own tests can still be wrong about the
+thing that matters (an amount, a dose, a permission, a record's identity), because the same agent
+wrote the reading of the spec, the test, and the code.
+
+The examples below come from a money platform, where Falcon was built. Swap in your own domain's
+triggers (README → "Pick your triggers").
 
 Falcon adds **loops** on top. Each loop below says what it is, what failure it exists for, and which
 files implement it. Read one at a time.
@@ -12,13 +16,13 @@ files implement it. Read one at a time.
 ## Loop 1 — Risk-tiered ownership
 
 **What:** every piece of work is tiered by *what a silent bug would cost*, not by how hard it looks.
-Boilerplate is delegated. Money movement, identity, audit integrity and determinism are
-**UNDERSTAND-IT**: the human owner hears the design one concept at a time, gives their own mental
+Boilerplate is delegated. Changes that hit a **trigger** (critical computation, identity, integrity,
+exactly-once/determinism, irreversible actions) are **UNDERSTAND-IT**: the human owner hears the design one concept at a time, gives their own mental
 model first, ratifies the decision as an ADR, and explains it back afterwards. If the owner accepts
 ~3 things in a row without engaging, the agent stops and asks them to explain.
 
 **Failure it prevents:** autonomy-first harnesses minimise the human, so the human's understanding of
-the system decays until nobody can say why the money moves the way it does.
+the system decays until nobody can say why the critical parts behave the way they do.
 
 **Files:** `template/CLAUDE.md` (the ownership table), `template/docs/adr/`.
 
@@ -39,7 +43,7 @@ name (mistakes M1) — and stale maps steering new sessions.
 **What:** nothing is "done". A capability (a business outcome, not a module) has two axes —
 `capability_state` (implemented → … → operational) and `permitted_use` (prototype → … →
 automated_live) — and its evidence is graded 0–5. A test written in the same session as the code is
-class 4 at best: its expected values may just be the code's output written down. Money rules need
+class 4 at best: its expected values may just be the code's output written down. Critical computations need
 **hand-derived fixtures** at inputs where rival readings disagree (P1).
 
 **Failure it prevents:** tests that agree with wrong code (CASE-01).
@@ -97,8 +101,9 @@ that blocks at the tool boundary. Each time a rule is broken, it moves up a rung
 
 ## Loop 8 — The human tests as an operator
 
-**What:** the owner exercises the system the way an operator would — small real sandbox transfers,
-returns, awkward cases — and compares the books against the bank. This is where most escapes come from.
+**What:** the owner exercises the system the way a real operator would (sandbox transactions,
+reversals, awkward edge cases) and compares the system's view against an outside source of truth
+(the bank statement, the lab result, the provider's console). This is where most escapes come from.
 
 **Failure it prevents:** reviewers that don't know the domain. A code reviewer catches smells, not
 "the ledger is $1 above the bank between the webhook and the sweep" (CASE-04).
@@ -123,6 +128,6 @@ session they're made.
 - Hooks bind Claude Code only. A human or another tool can still do anything.
 - `verify.py` assumes Python + pytest-style output; other stacks need `test_command` and the summary
   parser adapted.
-- Loop 1 and Loop 8 cost human time. That's the point on money paths, and waste elsewhere — so the tier
+- Loop 1 and Loop 8 cost human time. That's the point on trigger paths, and waste elsewhere — so the tier
   table decides where it's spent.
 - The case studies come from one codebase. The mechanism is general; the specific checks are seeds.
