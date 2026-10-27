@@ -38,6 +38,9 @@ Replace the `<e.g.>` examples with your domain's (see Falcon's README → "Pick 
 subagents cannot write those paths.
 
 **For UNDERSTAND-IT work:**
+0. **Plan first.** Write `docs/plans/NNNN-<slug>.md` from the template, and wait until the owner ratifies
+   it before writing code. `review/verify.py --plans` fails on a protected-path change with no ratified
+   plan. For delegated work a plan is optional.
 1. Walk the owner through the design **one concept at a time** before writing code; get their mental
    model first ("how would you approach this?").
 2. Name the domain term of art as it comes up (one line, not a lecture).
@@ -53,9 +56,11 @@ On delegated work, move fast — don't quiz the owner on mechanical parts.
 - **Before building:** ask the `oracle` (where does it live, which invariant, built or not); read the
   index of `docs/mistakes.md` and `docs/working_rules.md` and only the entries the work trips; read any
   `review/capabilities/` file the work touches — its open questions are constraints.
+- **Delegated agents work in their own git worktree,** never in the main checkout, so their edits can't
+  collide with the owner's or another agent's uncommitted work (W13).
 - **While building:** test-first. For UNDERSTAND-IT work, expected values are derived by hand
   from the authority's formula, not copied from the code's output (SCENARIOS P1).
-- **After building:** run `review/verify.py`; then the `review-harness` skill in `review` mode — a
+- **After building:** run `review/verify.py` (and `--plans` on UNDERSTAND-IT work); then the `review-harness` skill in `review` mode — a
   **fresh agent** reviews; the builder never verifies its own work. Prove load-bearing tests go red
   under mutation (`sweep`, P2).
 - **When the owner catches a miss:** `review-harness` `escape` mode — record it, and add a new check

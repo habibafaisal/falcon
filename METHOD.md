@@ -1,14 +1,14 @@
 # The Falcon method
 
-General-purpose agent harnesses make code match its spec: plan, test-first, review, worktrees. On a
-careful project that isn't enough. Code that is correct by its own tests can still be wrong about the
+General-purpose agent harnesses make code match its spec, and they spend the same process on every
+change. On a careful project that isn't enough. Code that is correct by its own tests can still be wrong about the
 thing that matters (an amount, a dose, a permission, a record's identity), because the same agent
 wrote the reading of the spec, the test, and the code.
 
 The examples below come from a money platform, where Falcon was built. Swap in your own domain's
 triggers (README → "Pick your triggers").
 
-Falcon adds **loops** on top. Each loop below says what it is, what failure it exists for, and which
+Falcon is built from **loops**. Each loop below says what it is, what failure it exists for, and which
 files implement it. Read one at a time.
 
 ---
@@ -18,13 +18,17 @@ files implement it. Read one at a time.
 **What:** every piece of work is tiered by *what a silent bug would cost*, not by how hard it looks.
 Boilerplate is delegated. Changes that hit a **trigger** (critical computation, identity, integrity,
 exactly-once/determinism, irreversible actions) are **UNDERSTAND-IT**: the human owner hears the design one concept at a time, gives their own mental
-model first, ratifies the decision as an ADR, and explains it back afterwards. If the owner accepts
+model first, ratifies the decision as an ADR, and explains it back afterwards. Planning follows the
+tier: UNDERSTAND-IT work starts from a plan in `docs/plans/` (trigger, protected paths, source of truth,
+failure window, the mutation that must turn the test red), ratified before code is written and
+enforced by `verify.py --plans`. Delegated work may skip the plan. If the owner accepts
 ~3 things in a row without engaging, the agent stops and asks them to explain.
 
 **Failure it prevents:** autonomy-first harnesses minimise the human, so the human's understanding of
 the system decays until nobody can say why the critical parts behave the way they do.
 
-**Files:** `template/CLAUDE.md` (the ownership table), `template/docs/adr/`.
+**Files:** `template/CLAUDE.md` (the ownership table), `template/docs/adr/`, `template/docs/plans/`,
+`verify.py --plans`.
 
 ## Loop 2 — Orient through an oracle, not file dumps
 

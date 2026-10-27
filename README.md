@@ -7,12 +7,15 @@ That covers money (payments, ledgers, billing), health (dosing, records), securi
 permissions), data (pipelines, migrations, analytics people decide on), infrastructure (deploys,
 deletes), and anything audited or regulated.
 
-Falcon's case studies are about money. The mechanism isn't. It assumes you already use general practices (spec, plan,
-test-first, worktrees, code review) and adds what those don't catch:
+Falcon's case studies are about money. The mechanism isn't. Falcon is a complete harness: plans,
+test-first, worktrees, independent review, and durable state in the repo. Most harnesses spend the same
+process on every change. Falcon spends it where a silent bug would cost something:
 
 1. **Risk-tiered ownership.** Work is tiered by what a silent bug would corrupt, not by how hard it
    looks. Critical code is UNDERSTAND-IT: the human hears the design one concept at a time and ratifies
    it. You pick the triggers for your domain.
+   Planning follows the tier: UNDERSTAND-IT work needs a ratified plan before code, enforced by
+   `verify.py --plans`; for delegated work a plan is optional.
 2. **Graded evidence, independent review.** Nothing is "done". The builder never verifies its own work,
    and a test only counts once it's been seen failing with its guard broken.
 3. **Misses become checks.** Every miss a human catches becomes an escape record plus an enforced check
@@ -55,29 +58,8 @@ The two recurrences:
   came back one layer up, on a twin *entry point* (a money effect added to the scheduled job but not the
   webhook), and the check was widened to cover entry points.
 
-No other class has a recorded recurrence after its guard landed.
-
-## Where Falcon fits
-
-Falcon runs **on top of** a general workflow harness, not instead of one.
-
-| | What it gives you | What happens to a miss |
-|---|---|---|
-| [Superpowers](https://github.com/obra/superpowers) | A mandatory workflow: brainstorm, plan, TDD, subagent execution, code review | Not recorded |
-| [Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin) | Plan, work, review, then **compound**: learnings written to `docs/solutions/` for later plans to read | Becomes a **note** |
-| [Spec Kit](https://github.com/github/spec-kit) | Spec-driven development: constitution, specify, plan, tasks, implement | Not recorded |
-| **Falcon** | What those don't check: whether the code is right about the thing that matters, when its own tests pass | Becomes a **check that fails**, the same session |
-
-Keep the workflow harness you use. Falcon adds:
-- tiers set by what a silent bug would cost, where the owner must *understand* critical code, not just approve it;
-- graded evidence, where a test counts only once it has been seen failing with its guard broken;
-- an enforced check for every miss a human catches, plus a guard ladder that escalates rules that keep breaking;
-- operator sessions compared against a source of truth outside the system.
-
-**Why Falcon copies files instead of installing as a plugin:** its tiers, escapes, mistake log, and checks
-are project state. They have to live in the repo, so they get reviewed, versioned, and inherited by the
-next contributor (Loop 9). The `falcon-init` skill is the only part that lives outside the repo, and all
-it does is copy those files in.
+No other class has a recorded recurrence after its guard landed. These numbers were collected while a
+general workflow plugin handled planning; Falcon's tier-aware plan step was added afterwards.
 
 ## Pick your triggers
 
@@ -101,9 +83,10 @@ template/                         → copied into your repo by install.sh
   CLAUDE.md                       working agreement: ownership tiers, review layer, guidelines
   NEXT-START-HERE.md, NEXT.md     session handoff + never-lossy to-do
   INVARIANTS.md, ARCHITECTURE.md  the law and the map
-  docs/working_rules.md           W1–W12 process rules
+  docs/working_rules.md           W1–W14 process rules
   docs/mistakes.md                recurring-mistake log (seeded with 8 common classes)
   docs/adr/                       decision records
+  docs/plans/                     plan template: required + ratified for UNDERSTAND-IT, optional for delegate
   .claude/settings.json           wires the hooks
   .claude/hooks/                  protect_paths · no_stash_while_live · next_md_size
   .claude/protected_paths.txt     the delegation fence's path list
@@ -147,6 +130,11 @@ Or set it up by hand:
 3. Set `source_dir` and `test_command` in `review/falcon.toml`, and name your source of truth in
    `review/GATES.md`.
 4. `pip install pyyaml` (plus `tomli` on Python < 3.11).
+
+**Why Falcon copies files instead of installing as a plugin:** its tiers, escapes, mistake log, and checks
+are project state. They have to live in the repo, so they get reviewed, versioned, and inherited by the
+next contributor (Loop 9). The `falcon-init` skill is the only part that lives outside the repo, and all
+it does is copy those files in.
 
 ## Daily use
 

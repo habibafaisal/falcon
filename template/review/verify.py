@@ -17,11 +17,17 @@ Runs the machine-checkable pass over review/capabilities/*.md:
            c. every module under the source dir is named somewhere in ARCHITECTURE.md (WARN)
            d. the source dir has not moved far ahead of ARCHITECTURE.md's last commit (WARN)
 
+  --plans  runs the PLAN GATE instead: every changed file (vs HEAD, plus untracked) that matches
+           .claude/protected_paths.txt must be covered by a RATIFIED plan in docs/plans/ that lists
+           it (or its directory) under `protected_paths:`. A proposed plan does not count. Plans are
+           optional for delegated work, so unprotected changes are never checked.
+
 Repo-specific settings (source dir, test command, canonical docs) live in review/falcon.toml.
 
 Exit 0 if no FAILs (WARNs allowed), 1 otherwise.
 Usage: python review/verify.py [capability-slug ...]
        python review/verify.py --map
+       python review/verify.py --plans
        python review/verify.py --no-stamp [slug ...]   (read-only: skip the executed: stamp; git pre-commit uses it)
 """
 
@@ -46,6 +52,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CAPABILITIES_DIR = REPO_ROOT / "review" / "capabilities"
 HAZARDS_PATH = REPO_ROOT / "review" / "HAZARDS.md"
 CONFIG_PATH = REPO_ROOT / "review" / "falcon.toml"
+PROTECTED_PATHS_FILE = REPO_ROOT / ".claude" / "protected_paths.txt"
+PLANS_DIR = REPO_ROOT / "docs" / "plans"
 
 
 def load_config(path=CONFIG_PATH):
@@ -565,6 +573,89 @@ def run_map(repo_root):
 
 
 # ---------------------------------------------------------------------------
+# Check 8 — plan gate (--plans): no UNDERSTAND-IT change without a ratified plan
+# ---------------------------------------------------------------------------
+
+def load_protected_entries(path=PROTECTED_PATHS_FILE):
+    """Entries from protected_paths.txt (same format the fence hook reads). Missing file -> none."""
+    if not path.exists():
+        return ()
+    entries = (line.split("#", 1)[0].strip() for line in path.read_text().splitlines())
+    return tuple(e for e in entries if e)
+
+
+def _path_matches(path, entry):
+    """A trailing "/" entry is a directory prefix; anything else is an exact file."""
+    return path.startswith(entry) if entry.endswith("/") else path == entry
+
+
+def load_plans(plans_dir=PLANS_DIR):
+    """(plans, errors). Each plan is its frontmatter dict plus `_file`. The template is skipped; a
+    plan file whose frontmatter can't be parsed is an ERROR, never silently ignored."""
+    plans, errors = [], []
+    if not plans_dir.is_dir():
+        return plans, errors
+    for f in sorted(plans_dir.glob("*.md")):
+        if f.name.startswith("0000-") or f.name.lower() == "readme.md":
+            continue
+        fm, err = parse_frontmatter(f.read_text())
+        if fm is None:
+            errors.append(f"{f.name}: {err}")
+            continue
+        fm["_file"] = f"docs/plans/{f.name}"
+        plans.append(fm)
+    return plans, errors
+
+
+def check_plans(changed, protected, plans):
+    """One Finding per changed protected path: PASS if a ratified plan covers it, FAIL otherwise."""
+    findings = []
+    for path in changed:
+        if not any(_path_matches(path, e) for e in protected):
+            continue
+        covering = [p for p in plans if any(_path_matches(path, c) for c in (p.get("protected_paths") or []))]
+        ratified = [p for p in covering if str(p.get("status", "")).lower() == "ratified"]
+        if ratified:
+            findings.append(Finding("plans", PASS, f"{path}: covered by {ratified[0]['_file']}"))
+        elif covering:
+            findings.append(Finding("plans", FAIL, f"{path}: plan {covering[0]['_file']} is "
+                                    f"{covering[0].get('status', 'unset')}, not ratified"))
+        else:
+            findings.append(Finding("plans", FAIL, f"{path}: protected (UNDERSTAND-IT) but no plan in "
+                                    "docs/plans/ lists it; write one and get it ratified first"))
+    return findings
+
+
+def changed_paths(repo_root):
+    """Files changed vs HEAD plus untracked files. A repo with no commits yet: every file counts."""
+    def git(*args):
+        return subprocess.run(["git", *args], cwd=repo_root, capture_output=True, text=True, check=True).stdout.split()
+    try:
+        tracked = git("diff", "--name-only", "HEAD")
+    except subprocess.CalledProcessError:  # no HEAD yet
+        tracked = git("ls-files", "--cached")
+    return sorted(set(tracked) | set(git("ls-files", "--others", "--exclude-standard")))
+
+
+def run_plans(repo_root):
+    print("== plan gate (--plans) ==")
+    plans, errors = load_plans(repo_root / "docs" / "plans")
+    findings = [Finding("plans", FAIL, e) for e in errors]
+    try:
+        changed = changed_paths(repo_root)
+    except (subprocess.SubprocessError, OSError) as e:  # git unavailable: say so, never PASS
+        findings.append(Finding("plans", FAIL, f"could not list changed files: {e}"))
+        changed = []
+    findings += check_plans(changed, load_protected_entries(repo_root / ".claude" / "protected_paths.txt"), plans)
+    if not findings:
+        findings.append(Finding("plans", PASS, "no protected paths changed"))
+    for f in findings:
+        print(f"  [{f.status}] {f.reason}")
+    print()
+    return 1 if any(f.status == FAIL for f in findings) else 0
+
+
+# ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
 
@@ -626,6 +717,8 @@ def main(argv):
     argv = [a for a in argv if a != "--no-stamp"]
     if "--map" in argv:
         return run_map(REPO_ROOT)
+    if "--plans" in argv:
+        return run_plans(REPO_ROOT)
     if not CAPABILITIES_DIR.is_dir():
         print("review/capabilities/ does not exist yet — nothing to verify.")
         print("(The capability files may still be being authored. Exit 0: not a failure.)")

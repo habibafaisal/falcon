@@ -21,6 +21,8 @@ only the rules the work trips.
 | W10 | Guard ladder: a rule isn't done until it's a check that fails | add a rule or M-entry |
 | W11 | One source of truth: import the definition, never restate it | write a predicate, formula, or constant that exists elsewhere |
 | W12 | Handoff vs to-do: `NEXT-START-HERE.md` is rewritten, `NEXT.md` is never lossy | end a session |
+| W13 | A delegate builds in its own worktree; a probe is undone from a copy, never `git checkout` | hand work to a subagent, or revert an experiment |
+| W14 | Plan by tier: required and ratified for UNDERSTAND-IT, optional for delegate | start any piece of work |
 
 ---
 
@@ -72,3 +74,16 @@ and the drift is silent. (mistakes M4)
 ## W12 — Handoff vs to-do
 `NEXT-START-HERE.md`: a few lines, rewritten every session, enough to `/clear` and resume.
 `NEXT.md`: everything to do and know, concise but never lossy.
+
+## W13 — Delegates in worktrees; undo probes from a copy
+A delegated agent gets its own worktree (`git worktree add -b <branch> <path>`, or the Agent tool's
+`isolation: "worktree"`). To undo a temporary edit (a mutation probe, an experiment), restore the file
+from a copy you made before the edit. `git checkout -- <file>` resets the whole file to the last commit
+and silently deletes any uncommitted work in it.
+
+## W14 — Plan by tier
+UNDERSTAND-IT work starts with a plan in `docs/plans/` that names the trigger, the protected paths, the
+source of truth, the failure window, and the mutation that must turn the test red. The owner ratifies it
+before code is written; `review/verify.py --plans` enforces this mechanically. Delegated work may skip
+the plan: there, fixtures and review catch mistakes, and a plan is overhead.
+
