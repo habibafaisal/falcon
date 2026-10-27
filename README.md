@@ -52,8 +52,11 @@ template/                         → copied into your repo by install.sh
   .claude/hooks/                  protect_paths · no_stash_while_live · next_md_size
   .claude/protected_paths.txt     the delegation fence's path list
   .claude/agents/oracle.md        read-only codebase oracle
+  .claude/skills/falcon-setup/    first-run interview: you choose UNDERSTAND-IT vs Delegate → ADR-0001
   .claude/skills/review-harness/  init · review · sweep · escape
   review/                         GATES · SCENARIOS · HAZARDS · verify.py · falcon.toml
+  review/OPERATOR_SESSION.md      Loop 8: test as an operator, diff totals against the source of truth
+skills/falcon-init/               → copy to ~/.claude/skills/ once; "set up falcon" installs + interviews
 examples/case-studies/            sanitized escapes
 tests/                            tests for verify.py and the hooks
 ```
