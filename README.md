@@ -60,12 +60,28 @@ tests/                            tests for verify.py and the hooks
 
 ## Install
 
+**Once per machine:** clone Falcon and add the `falcon-init` skill to Claude Code.
+
 ```bash
-git clone https://github.com/habibafaisal/falcon.git
-./falcon/install.sh /path/to/your/repo     # never overwrites; lists files to merge by hand
+git clone https://github.com/habibafaisal/falcon.git ~/falcon
+mkdir -p ~/.claude/skills && cp -r ~/falcon/skills/falcon-init ~/.claude/skills/
 ```
 
-Then:
+**Per project:** open Claude Code in the repo and say **"set up falcon"**. `falcon-init` runs the installer,
+then starts the setup interview. (Cloned somewhere other than `~/falcon`? Set `FALCON_HOME`.)
+
+Without the skill, run the installer yourself:
+
+```bash
+~/falcon/install.sh /path/to/your/repo     # never overwrites; lists files to merge by hand
+```
+
+Then open Claude Code in the repo. It sees the unfinished `CLAUDE.md` and runs the `falcon-setup`
+interview. You decide what is UNDERSTAND-IT and what is Delegate, in one of two modes: name your own
+triggers from scratch, or strike out the defaults (every row you keep needs a reason). Your choices are
+recorded in `docs/adr/0001-ownership-tiers.md`, and you can redo them any time.
+
+Or set it up by hand:
 1. Fill in `CLAUDE.md` and adapt the ownership table to your domain.
 2. List your UNDERSTAND-IT paths in `.claude/protected_paths.txt`, each with what a delegate could
    silently break there.

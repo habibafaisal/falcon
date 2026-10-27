@@ -2,6 +2,10 @@
 
 @NEXT-START-HERE.md
 
+> **First run.** If this file still contains `<Project>`, setup isn't done. Before any other work, run
+> the `falcon-setup` skill: it interviews the owner and fills in this file, the protected paths, and
+> `review/` with the owner's own choices. The skill deletes this block when it finishes.
+
 ## What this is
 
 <2–5 lines: what the system does, what must never break.> The map is `ARCHITECTURE.md` — ask the

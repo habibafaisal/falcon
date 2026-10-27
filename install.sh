@@ -14,7 +14,7 @@ while IFS= read -r -d '' f; do
   mkdir -p "$dest/$(dirname "$rel")"
   cp "$f" "$dest/$rel"
   copied=$((copied + 1))
-done < <(find "$src" -type f -print0)
+done < <(find "$src" -type f -not -path "*/__pycache__/*" -print0)
 
 chmod +x "$dest"/.claude/hooks/*.py 2>/dev/null || true
 echo "Falcon: copied $copied files into $dest"
@@ -25,9 +25,11 @@ fi
 cat <<'NEXT'
 
 Next steps:
-  1. CLAUDE.md            — fill in the project lines and adapt the ownership table to your domain
-  2. .claude/protected_paths.txt — list your money/identity/audit paths, each with its invalidation
-  3. review/falcon.toml   — set source_dir and test_command
-  4. review/GATES.md      — name your single source of truth under "Intent sources"
-  5. pip install pyyaml   — verify.py needs it (and tomli on Python < 3.11)
+  1. Open Claude Code in the repo. It sees the unfinished CLAUDE.md and runs the falcon-setup
+     interview (or say "set up falcon"). You choose: name your own triggers, or strike out the
+     defaults. It fills CLAUDE.md, .claude/protected_paths.txt, review/falcon.toml, review/GATES.md,
+     and records your choices in docs/adr/0001-ownership-tiers.md.
+  2. pip install pyyaml   — verify.py needs it (and tomli on Python < 3.11)
+
+  Prefer to do it by hand? Edit those same files directly; the setup skill is optional.
 NEXT
