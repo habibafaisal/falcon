@@ -1,0 +1,18 @@
+# Repo-specific settings for review/verify.py. Every key is optional.
+
+# Where production code lives: used for the same-origin check and the --map pass.
+source_dir = "app"
+
+# How to run governing tests. verify.py appends the test paths and "-q".
+test_command = ["python", "-m", "pytest"]
+# test_command = ["uv", "run", "pytest"]
+
+# Canonical docs whose backticked paths must exist (--map). Historical logs are deliberately excluded:
+# their citations are provenance, not claims.
+map_docs = [
+  "ARCHITECTURE.md", "CLAUDE.md", "INVARIANTS.md", "docs/working_rules.md",
+  "review/GATES.md", "review/HAZARDS.md", "review/SCENARIOS.md", ".claude/agents/oracle.md",
+]
+
+# WARN when this many commits touched source_dir since ARCHITECTURE.md last changed.
+map_drift_commits = 15

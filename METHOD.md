@@ -1,0 +1,128 @@
+# The Falcon method
+
+General-purpose agent harnesses make code match its spec: plan, test-first, review, worktrees. On a
+money system that isn't enough. Code that is correct by its own tests can still be wrong about money,
+because the same agent wrote the reading of the spec, the test, and the code.
+
+Falcon adds **loops** on top. Each loop below says what it is, what failure it exists for, and which
+files implement it. Read one at a time.
+
+---
+
+## Loop 1 — Risk-tiered ownership
+
+**What:** every piece of work is tiered by *what a silent bug would cost*, not by how hard it looks.
+Boilerplate is delegated. Money movement, identity, audit integrity and determinism are
+**UNDERSTAND-IT**: the human owner hears the design one concept at a time, gives their own mental
+model first, ratifies the decision as an ADR, and explains it back afterwards. If the owner accepts
+~3 things in a row without engaging, the agent stops and asks them to explain.
+
+**Failure it prevents:** autonomy-first harnesses minimise the human, so the human's understanding of
+the system decays until nobody can say why the money moves the way it does.
+
+**Files:** `template/CLAUDE.md` (the ownership table), `template/docs/adr/`.
+
+## Loop 2 — Orient through an oracle, not file dumps
+
+**What:** a read-only `oracle` agent holds the map (`ARCHITECTURE.md`, `INVARIANTS.md`) and answers
+"where does X live, which invariant governs it, is it built?" with `file::symbol` + invariant + build
+state. Exploration goes to fresh agents; the main thread keeps conclusions only. `verify.py --map`
+fails when the map cites paths that no longer exist.
+
+**Failure it prevents:** the census trap — rebuilding something that already exists under another
+name (mistakes M1) — and stale maps steering new sessions.
+
+**Files:** `template/.claude/agents/oracle.md`, `template/ARCHITECTURE.md`, `verify.py --map`.
+
+## Loop 3 — Evidence is graded, not "passing"
+
+**What:** nothing is "done". A capability (a business outcome, not a module) has two axes —
+`capability_state` (implemented → … → operational) and `permitted_use` (prototype → … →
+automated_live) — and its evidence is graded 0–5. A test written in the same session as the code is
+class 4 at best: its expected values may just be the code's output written down. Money rules need
+**hand-derived fixtures** at inputs where rival readings disagree (P1).
+
+**Failure it prevents:** tests that agree with wrong code (CASE-01).
+
+**Files:** `template/review/GATES.md`, `SCENARIOS.md`, `capabilities/`, `verify.py` (schema,
+same-origin flag, only it may stamp `executed:`).
+
+## Loop 4 — The builder never verifies
+
+**What:** after building, a **fresh agent** that knows nothing the builder knew reviews against four
+lenses (intent, workflow, architecture, operations), re-reads the authority live, and must name a
+mutation that should turn a test red. Builder and verifier disagreements are recorded side by side.
+
+**Failure it prevents:** self-review — the builder's misreading of the spec survives its own review.
+
+**Files:** `template/.claude/skills/review-harness/` (`review` operation,
+`agents/capability-reviewer.md`).
+
+## Loop 5 — Red-ability: see it fail
+
+**What:** a test for a load-bearing invariant counts only after it's been shown red with the guard
+inverted. The `sweep` operation snapshots the file, applies the recorded mutation, confirms red,
+restores from the snapshot (never `git checkout`), confirms green, and stamps `red_ability`.
+
+**Failure it prevents:** vacuous green tests (CASE-02), and fakes more forgiving than reality
+(CASE-03, P3).
+
+**Files:** review-harness `sweep`, capability frontmatter `red_ability:`.
+
+## Loop 6 — Every miss becomes a check
+
+**What:** when the human catches something every automated layer let through, it's recorded as an
+**escape** — what happened, why each layer missed it — and is incomplete until it ships a new check
+**in the same session**: a test, a scenario, a hazard row, or a hook. The second time a mistake class
+happens, it becomes an M-entry in `docs/mistakes.md`.
+
+**Failure it prevents:** learnings that become notes the next agent never reads. Notes aren't enforcement.
+
+**Files:** review-harness `escape`, `template/review/escapes/`, `template/docs/mistakes.md`,
+`examples/case-studies/`.
+
+## Loop 7 — The guard ladder
+
+**What:** a rule climbs: prose in CLAUDE.md → a check that fails (test, scenario, hazard scan) → a hook
+that blocks at the tool boundary. Each time a rule is broken, it moves up a rung.
+
+- `protect_paths.py` — a delegated subagent can't write the paths in `.claude/protected_paths.txt`;
+  the main session always can. Each path carries its named invalidation.
+- `no_stash_while_live.py` — no `git stash/checkout/reset` while tests or another session are live.
+- `next_md_size.py` — soft nudge when the to-do file bloats.
+
+**Failure it prevents:** agents skip prompt-level rules under pressure (CASE-06 broke a prose rule twice).
+
+**Files:** `template/.claude/settings.json`, `template/.claude/hooks/`.
+
+## Loop 8 — The human tests as an operator
+
+**What:** the owner exercises the system the way an operator would — small real sandbox transfers,
+returns, awkward cases — and compares the books against the bank. This is where most escapes come from.
+
+**Failure it prevents:** reviewers that don't know the domain. A code reviewer catches smells, not
+"the ledger is $1 above the bank between the webhook and the sweep" (CASE-04).
+
+**Files:** none — it's a practice. Its output feeds Loop 6.
+
+## Loop 9 — Continuity outside the model
+
+**What:** durable state lives in the repo. `NEXT-START-HERE.md` is a short handoff rewritten every
+session; `NEXT.md` is the full, never-lossy to-do; rulings go into `INVARIANTS.md` or an ADR the
+session they're made.
+
+**Failure it prevents:** decisions that exist only in chat memory and silently vanish on `/clear`.
+
+---
+
+## Honest limits
+
+- The fence is **fail-open** by design (an unparseable payload is allowed) and only fences subagents.
+  It's a delegation guard, not a security boundary. It can be switched off (`FALCON_FENCE=off`); if you
+  do, record why.
+- Hooks bind Claude Code only. A human or another tool can still do anything.
+- `verify.py` assumes Python + pytest-style output; other stacks need `test_command` and the summary
+  parser adapted.
+- Loop 1 and Loop 8 cost human time. That's the point on money paths, and waste elsewhere — so the tier
+  table decides where it's spent.
+- The case studies come from one codebase. The mechanism is general; the specific checks are seeds.

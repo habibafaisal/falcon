@@ -1,0 +1,12 @@
+[project]
+name = "falcon-harness"
+version = "0.1.0"
+description = "A Claude Code harness for money-critical codebases"
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

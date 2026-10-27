@@ -1,0 +1,10 @@
+# Delegation fence — paths a SUBAGENT may not write (the main session always can).
+# One entry per line. Trailing "/" = directory prefix. Every entry MUST carry its named invalidation:
+# what a delegate could silently break here. Can't name one? The path doesn't belong.
+#
+# Examples (replace with your repo's paths):
+# src/ledger/              # double-entry balance + signed integer cents -> MONEY CORRECTNESS
+# src/payments/execute.py  # exactly-once claim before the rail call -> pays twice on retry (MONEY)
+# src/audit/               # hash chain seal/verify/canonicalization -> forgeable chain that still verifies (AUDIT TRUTH)
+# src/identity/keys.py     # dedup / entity-resolution keys -> merges two real customers (IDENTITY)
+review/verify.py           # the verifier itself; only it may stamp `executed:` (CERTIFICATION BOUNDARY)
