@@ -7,8 +7,7 @@ That covers money (payments, ledgers, billing), health (dosing, records), securi
 permissions), data (pipelines, migrations, analytics people decide on), infrastructure (deploys,
 deletes), and anything audited or regulated.
 
-Falcon was extracted from building a live money-movement platform with Claude Code, so its case studies
-are about money. The mechanism isn't. It assumes you already use general practices (spec, plan,
+Falcon's case studies are about money. The mechanism isn't. It assumes you already use general practices (spec, plan,
 test-first, worktrees, code review) and adds what those don't catch:
 
 1. **Risk-tiered ownership.** Work is tiered by what a silent bug would corrupt, not by how hard it
