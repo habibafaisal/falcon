@@ -44,7 +44,9 @@ one door only. Recurs one layer up: the twin is a *door*, not a function.
 **Mistake:** reverting a one-line mutation with `git checkout <file>` reverts the whole file to HEAD,
 deleting every uncommitted change in it.
 **Guard:** snapshot with `cp` before mutating, restore with `cp`; or commit first. Hook:
-`no_stash_while_live.py` blocks stash/checkout/reset while tests or another session are live.
+`no_stash_while_live.py` blocks stash/checkout/reset while tests or another session are live, and
+`no_discard_uncommitted.py` blocks a checkout/restore of any file with uncommitted changes, or
+`reset --hard` over them, whatever else is running (CASE-07: the first hook alone let one through).
 
 ## M6 — The forgiving fake
 **Mistake:** a fake replaces an external client wholesale; tests pass because the fake accepts anything.

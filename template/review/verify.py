@@ -17,7 +17,7 @@ Runs the machine-checkable pass over review/capabilities/*.md:
            c. every module under the source dir is named somewhere in ARCHITECTURE.md (WARN)
            d. the source dir has not moved far ahead of ARCHITECTURE.md's last commit (WARN)
 
-  --plans  runs the PLAN GATE instead: every changed file (vs HEAD, plus untracked) that matches
+  --plans  runs ONLY the PLAN GATE (a plain run includes it too, so it never depends on remembering): every changed file (vs HEAD, plus untracked) that matches
            .claude/protected_paths.txt must be covered by a RATIFIED plan in docs/plans/ that lists
            it (or its directory) under `protected_paths:`. A proposed plan does not count. Plans are
            optional for delegated work, so unprotected changes are never checked.
@@ -719,10 +719,13 @@ def main(argv):
         return run_map(REPO_ROOT)
     if "--plans" in argv:
         return run_plans(REPO_ROOT)
+    # The plan gate runs on every plain run, before anything else: a protected change with no
+    # ratified plan fails the run whether or not anyone remembered to ask for it.
+    plans_rc = run_plans(REPO_ROOT)
     if not CAPABILITIES_DIR.is_dir():
         print("review/capabilities/ does not exist yet — nothing to verify.")
-        print("(The capability files may still be being authored. Exit 0: not a failure.)")
-        return 0
+        print("(The capability files may still be being authored. Not a failure by itself.)")
+        return plans_rc
 
     if argv:
         files = []
@@ -739,8 +742,8 @@ def main(argv):
             p for p in CAPABILITIES_DIR.glob("*.md") if p.name.lower() != "readme.md"
         )
         if not files:
-            print("review/capabilities/ has no capability files yet — nothing to verify. Exit 0.")
-            return 0
+            print("review/capabilities/ has no capability files yet — nothing to verify.")
+            return plans_rc
 
     any_fail = False
     summary = []
@@ -769,7 +772,7 @@ def main(argv):
     width = max((len(s) for s, _ in summary), default=0)
     for slug, worst in summary:
         print(f"  {slug.ljust(width)}  {worst}")
-    return 1 if any_fail else 0
+    return 1 if any_fail or plans_rc else 0
 
 
 if __name__ == "__main__":

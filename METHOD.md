@@ -97,6 +97,9 @@ that blocks at the tool boundary. Each time a rule is broken, it moves up a rung
 - `protect_paths.py` — a delegated subagent can't write the paths in `.claude/protected_paths.txt`;
   the main session always can. Each path carries its named invalidation.
 - `no_stash_while_live.py` — no `git stash/checkout/reset` while tests or another session are live.
+- `no_discard_uncommitted.py` — no `git checkout/restore` of a file with uncommitted changes, or
+  `reset --hard` over them, at any time (CASE-07).
+- `human_ratifies.py` — no agent, main session included, can set a plan to `status: ratified`.
 - `next_md_size.py` — soft nudge when the to-do file bloats.
 
 **Failure it prevents:** agents skip prompt-level rules under pressure (CASE-06 broke a prose rule twice).
@@ -132,6 +135,8 @@ session they're made.
   It's a delegation guard, not a security boundary. It can be switched off (`FALCON_FENCE=off`); if you
   do, record why.
 - Hooks bind Claude Code only. A human or another tool can still do anything.
+- `human_ratifies` guards the status line and textual Bash. An agent can still edit other lines of an
+  already-ratified plan; the plan's git history is the backstop.
 - `verify.py` assumes Python + pytest-style output; other stacks need `test_command` and the summary
   parser adapted.
 - Loop 1 and Loop 8 cost human time. That's the point on trigger paths, and waste elsewhere — so the tier

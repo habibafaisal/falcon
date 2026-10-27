@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/template/.claude/hooks/no_stash_while_live.py\""},
+          {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/template/.claude/hooks/no_discard_uncommitted.py\""}
+        ]
+      }
+    ]
+  }
+}

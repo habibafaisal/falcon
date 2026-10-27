@@ -40,7 +40,7 @@ flowchart TD
 
 State lives in the repo, not the chat (Loop 9), so all of this survives `/clear`.
 
-Read [`METHOD.md`](METHOD.md) for the loops, and [`examples/case-studies/`](examples/case-studies/) for six
+Read [`METHOD.md`](METHOD.md) for the loops, and [`examples/case-studies/`](examples/case-studies/) for seven
 real misses that produced checks.
 
 ## Results so far
@@ -88,7 +88,7 @@ template/                         → copied into your repo by install.sh
   docs/adr/                       decision records
   docs/plans/                     plan template: required + ratified for UNDERSTAND-IT, optional for delegate
   .claude/settings.json           wires the hooks
-  .claude/hooks/                  protect_paths · no_stash_while_live · next_md_size
+  .claude/hooks/                  protect_paths · human_ratifies · no_stash_while_live · no_discard_uncommitted · next_md_size
   .claude/protected_paths.txt     the delegation fence's path list
   .claude/agents/oracle.md        read-only codebase oracle
   .claude/skills/falcon-setup/    first-run interview: you choose UNDERSTAND-IT vs Delegate → ADR-0001

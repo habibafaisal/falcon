@@ -17,7 +17,7 @@ never `[PASS]` (CASE-05).
 | H5 | control that lives only in memory (lost on restart) | judgment | | |
 | H6 | same-origin evidence presented as independent | verify.py same-origin check (WARN) | auto-downgrade to class 4 | |
 | H7 | external client tested only through a wholesale fake (P3) | judgment — for each `Fake<Vendor>` in tests, a real-client payload test exists | | permitted_use ≥ human_approved_live |
-| H8 | mutation probe reverted with `git checkout/restore/reset` on an uncommitted file — deletes the whole uncommitted build | judgment — snapshot with `cp` first, restore with `cp` back; or commit before probing | no_stash_while_live hook (partial) | |
+| H8 | mutation probe reverted with `git checkout/restore/reset` on an uncommitted file — deletes the whole uncommitted build | judgment — snapshot with `cp` first, restore with `cp` back; or commit before probing | no_stash_while_live + no_discard_uncommitted hooks | |
 | H9 | an effect added to one door but not its twins (P4) | judgment | | |
 
 Replace the H1/H3 commands with your stack's; delete rows that don't apply.

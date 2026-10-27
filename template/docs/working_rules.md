@@ -21,7 +21,7 @@ only the rules the work trips.
 | W10 | Guard ladder: a rule isn't done until it's a check that fails | add a rule or M-entry |
 | W11 | One source of truth: import the definition, never restate it | write a predicate, formula, or constant that exists elsewhere |
 | W12 | Handoff vs to-do: `NEXT-START-HERE.md` is rewritten, `NEXT.md` is never lossy | end a session |
-| W13 | A delegate builds in its own worktree; a probe is undone from a copy, never `git checkout` | hand work to a subagent, or revert an experiment |
+| W13 | A delegate builds in its own worktree | hand work to a subagent |
 | W14 | Plan by tier: required and ratified for UNDERSTAND-IT, optional for delegate | start any piece of work |
 
 ---
@@ -75,15 +75,15 @@ and the drift is silent. (mistakes M4)
 `NEXT-START-HERE.md`: a few lines, rewritten every session, enough to `/clear` and resume.
 `NEXT.md`: everything to do and know, concise but never lossy.
 
-## W13 — Delegates in worktrees; undo probes from a copy
+## W13 — Delegates in worktrees
 A delegated agent gets its own worktree (`git worktree add -b <branch> <path>`, or the Agent tool's
-`isolation: "worktree"`). To undo a temporary edit (a mutation probe, an experiment), restore the file
-from a copy you made before the edit. `git checkout -- <file>` resets the whole file to the last commit
-and silently deletes any uncommitted work in it.
+`isolation: "worktree"`), so its edits can't collide with the owner's or another agent's uncommitted
+work. Undoing a probe safely is M5 in `mistakes.md`, enforced by the `no_discard_uncommitted` hook.
 
 ## W14 — Plan by tier
 UNDERSTAND-IT work starts with a plan in `docs/plans/` that names the trigger, the protected paths, the
 source of truth, the failure window, and the mutation that must turn the test red. The owner ratifies it
-before code is written; `review/verify.py --plans` enforces this mechanically. Delegated work may skip
+before code is written. Two checks enforce it: the `human_ratifies` hook refuses an agent that sets
+`status: ratified`, and every `review/verify.py` run fails on a protected change without a ratified plan. Delegated work may skip
 the plan: there, fixtures and review catch mistakes, and a plan is overhead.
 

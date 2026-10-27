@@ -14,5 +14,7 @@ unchanged. Each one: what happened → why every automated layer missed it → t
 | [CASE-04](CASE-04-twin-door.md) | Webhook and sweep wrote the same row but only one booked the money | per-path tests | SCENARIOS P4, HAZARDS H9, mistakes M4 |
 | [CASE-05](CASE-05-verifier-lied.md) | The gatekeeper certified checks it never ran | the verifier itself | P5 + verify.py fixes + tests |
 | [CASE-06](CASE-06-checkout-wiped-build.md) | `git checkout` as "undo" deleted an uncommitted build | process (no layer watched it) | HAZARDS H8, mistakes M5, `no_stash_while_live` hook |
+| [CASE-07](CASE-07-harness-not-on-itself.md) | CASE-06 again, while building Falcon itself | the hook wasn't installed in Falcon's repo, and fired only while tests ran | `no_discard_uncommitted` hook; Falcon runs its own hooks |
 
-The common thread: every one passed the tests written by the same agent that wrote the code.
+The common thread in 01–05: every one passed the tests written by the same agent that wrote the code.
+06–07 are about how the agent edits files, which no product test watches.

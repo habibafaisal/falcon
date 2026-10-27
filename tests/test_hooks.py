@@ -114,3 +114,95 @@ def test_next_md_over_budget_warns_never_blocks(tmp_path):
 def test_next_md_under_budget_is_silent(tmp_path):
     (tmp_path / "NEXT.md").write_text("short")
     assert run_hook("next_md_size.py", {}, tmp_path) is None
+
+
+# --- no_discard_uncommitted ---------------------------------------------------------------
+
+def git_repo_with_dirty_file(tmp_path):
+    def g(*a):
+        subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", *a], cwd=tmp_path, check=True,
+                       capture_output=True)
+    g("init", "-q")
+    (tmp_path / "clean.py").write_text("a = 1\n")
+    (tmp_path / "dirty.py").write_text("b = 1\n")
+    g("add", "-A")
+    g("commit", "-qm", "init")
+    (tmp_path / "dirty.py").write_text("b = 2  # uncommitted build\n")
+    return tmp_path
+
+
+def bash(cmd, cwd):
+    return {"tool_name": "Bash", "cwd": str(cwd), "tool_input": {"command": cmd}}
+
+
+def test_checkout_of_a_file_with_uncommitted_changes_is_denied(tmp_path):
+    repo = git_repo_with_dirty_file(tmp_path)
+    assert denied(run_hook("no_discard_uncommitted.py", bash("git checkout -- dirty.py", repo), repo))
+    assert denied(run_hook("no_discard_uncommitted.py", bash("git restore dirty.py", repo), repo))
+    assert denied(run_hook("no_discard_uncommitted.py", bash("git checkout .", repo), repo))
+    assert denied(run_hook("no_discard_uncommitted.py", bash("git reset --hard", repo), repo))
+
+
+def test_cd_before_the_checkout_is_followed(tmp_path):
+    (tmp_path / "r").mkdir()
+    repo = git_repo_with_dirty_file(tmp_path / "r")
+    elsewhere = tmp_path
+    cmd = f"cd {repo} && uv run pytest -q; git checkout -- dirty.py 2>/dev/null"
+    assert denied(run_hook("no_discard_uncommitted.py", bash(cmd, elsewhere), elsewhere))
+
+
+def test_clean_file_branch_switch_and_mentions_are_allowed(tmp_path):
+    repo = git_repo_with_dirty_file(tmp_path)
+    assert not denied(run_hook("no_discard_uncommitted.py", bash("git checkout -- clean.py", repo), repo))
+    assert not denied(run_hook("no_discard_uncommitted.py", bash("git checkout -b feature", repo), repo))
+    assert not denied(run_hook("no_discard_uncommitted.py", bash('git commit -m "git checkout dirty.py"', repo), repo))
+    assert not denied(run_hook("no_discard_uncommitted.py", bash("git reset --soft HEAD~0", repo), repo))
+
+
+def test_untracked_only_tree_allows_reset_hard(tmp_path):
+    repo = git_repo_with_dirty_file(tmp_path)
+    (repo / "dirty.py").write_text("b = 1\n")  # back to committed
+    (repo / "new.py").write_text("untracked\n")
+    assert not denied(run_hook("no_discard_uncommitted.py", bash("git reset --hard", repo), repo))
+
+
+# --- human_ratifies --------------------------------------------------------------------------
+
+def plan_edit(tmp_path, old, new, agent=False):
+    p = {"tool_name": "Edit", "cwd": str(tmp_path),
+         "tool_input": {"file_path": str(tmp_path / "docs/plans/0001-x.md"), "old_string": old, "new_string": new}}
+    if agent:
+        p["agent_id"] = "sub-1"
+    return p
+
+
+def test_setting_a_plan_to_ratified_is_denied_even_in_the_main_session(tmp_path):
+    out = run_hook("human_ratifies.py", plan_edit(tmp_path, "status: proposed", "status: ratified"), tmp_path)
+    assert denied(out)
+    assert "owner" in out["hookSpecificOutput"]["permissionDecisionReason"]
+
+
+def test_writing_a_ratified_plan_file_is_denied(tmp_path):
+    p = {"tool_name": "Write", "cwd": str(tmp_path),
+         "tool_input": {"file_path": str(tmp_path / "docs/plans/0002-y.md"), "content": "---\nstatus: ratified\n---\n"}}
+    assert denied(run_hook("human_ratifies.py", p, tmp_path))
+
+
+def test_bash_that_ratifies_a_plan_is_denied(tmp_path):
+    cmd = "sed -i '' 's/status: proposed/status: ratified/' docs/plans/0001-x.md"
+    assert denied(run_hook("human_ratifies.py", bash(cmd, tmp_path), tmp_path))
+
+
+def test_other_plan_edits_and_other_files_are_allowed(tmp_path):
+    assert not denied(run_hook("human_ratifies.py", plan_edit(tmp_path, "## Steps", "## Steps\n1. a"), tmp_path))
+    assert not denied(run_hook("human_ratifies.py", plan_edit(tmp_path, "status: draft", "status: proposed"), tmp_path))
+    other = {"tool_name": "Edit", "cwd": str(tmp_path),
+             "tool_input": {"file_path": str(tmp_path / "src/a.py"), "old_string": "x", "new_string": "status: ratified"}}
+    assert not denied(run_hook("human_ratifies.py", other, tmp_path))
+    assert not denied(run_hook("human_ratifies.py", bash("grep -c ratified docs/plans/*.md", tmp_path), tmp_path))
+
+
+def test_edit_that_keeps_an_existing_ratified_line_is_allowed(tmp_path):
+    old = "status: ratified\nsource_of_truth: spec.md"
+    new = "status: ratified\nsource_of_truth: spec.md#fees"
+    assert not denied(run_hook("human_ratifies.py", plan_edit(tmp_path, old, new), tmp_path))

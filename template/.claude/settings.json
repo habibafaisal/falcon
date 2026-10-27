@@ -3,16 +3,43 @@
     "PreToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit",
-        "hooks": [{"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_paths.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_paths.py\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/human_ratifies.py\""
+          }
+        ]
       },
       {
         "matcher": "Bash",
-        "hooks": [{"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no_stash_while_live.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no_stash_while_live.py\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no_discard_uncommitted.py\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/human_ratifies.py\""
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "hooks": [{"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/next_md_size.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/next_md_size.py\""
+          }
+        ]
       }
     ]
   }
