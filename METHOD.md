@@ -132,4 +132,3 @@ session they're made.
   parser adapted.
 - Loop 1 and Loop 8 cost human time. That's the point on trigger paths, and waste elsewhere — so the tier
   table decides where it's spent.
-- The case studies come from one codebase. The mechanism is general; the specific checks are seeds.

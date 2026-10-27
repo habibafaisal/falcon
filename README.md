@@ -23,6 +23,23 @@ test-first, worktrees, code review) and adds what those don't catch:
 Read [`METHOD.md`](METHOD.md) for the loops, and [`examples/case-studies/`](examples/case-studies/) for six
 real misses that produced checks.
 
+## Results so far
+
+| | |
+|---|---|
+| Escapes: misses a human caught after every automated layer passed | **20**, each shipped a new check the same session |
+| Mistake classes logged, each with the guard that stops it | **27** |
+| Classes that recurred after a guard existed | **2**, and both are the guard ladder at work |
+
+The two recurrences:
+- **A lock keyed at a different grain than the id it protects.** The first guard was a prose rule.
+  The mistake came back, and the rule became a check.
+- **A fix applied to one of two parallel paths.** The first check pinned twin *functions*. The mistake
+  came back one layer up, on a twin *entry point* (a money effect added to the scheduled job but not the
+  webhook), and the check was widened to cover entry points.
+
+No other class has a recorded recurrence after its guard landed.
+
 ## Pick your triggers
 
 The UNDERSTAND-IT tier is a set of *triggers*: kinds of change where a silent bug corrupts something
