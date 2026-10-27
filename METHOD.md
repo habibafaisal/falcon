@@ -108,7 +108,9 @@ reversals, awkward edge cases) and compares the system's view against an outside
 **Failure it prevents:** reviewers that don't know the domain. A code reviewer catches smells, not
 "the ledger is $1 above the bank between the webhook and the sweep" (CASE-04).
 
-**Files:** none — it's a practice. Its output feeds Loop 6.
+**Files:** `template/review/OPERATOR_SESSION.md`: the source of truth, awkward cases to try, a totals-level
+diff table, and an optional Claude-in-Chrome pass where Claude drives the UI and the human signs the diff.
+Its output feeds Loop 6.
 
 ## Loop 9 — Continuity outside the model
 
