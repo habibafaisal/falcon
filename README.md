@@ -7,6 +7,8 @@ That covers money (payments, ledgers, billing), health (dosing, records), securi
 permissions), data (pipelines, migrations, analytics people decide on), infrastructure (deploys,
 deletes), and anything audited or regulated.
 
+New project? Run `/falcon-init` (or say "set up falcon"): it installs Falcon and interviews you to set it up.
+
 Falcon's case studies are about money. The mechanism isn't. Falcon is a complete harness: plans,
 test-first, worktrees, independent review, and durable state in the repo. Most harnesses spend the same
 process on every change. Falcon spends it where a silent bug would cost something:
@@ -47,6 +49,7 @@ real misses that produced checks.
 
 | | |
 |---|---|
+| Context | one codebase, ~7 months, single owner, mid-size |
 | Escapes: misses a human caught after every automated layer passed | **20**, each shipped a new check the same session |
 | Mistake classes logged, each with the guard that stops it | **27** |
 | Classes that recurred after a guard existed | **2**, and both are the guard ladder at work |
@@ -60,6 +63,8 @@ The two recurrences:
 
 No other class has a recorded recurrence after its guard landed. These numbers were collected while a
 general workflow plugin handled planning; Falcon's tier-aware plan step was added afterwards.
+
+So far run on one project; cross-project use is untested.
 
 ## Pick your triggers
 

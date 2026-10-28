@@ -1,0 +1,19 @@
+{
+  "session_id": "00000000-0000-0000-0000-000000000002",
+  "transcript_path": "/home/user/.claude/projects/-home-user-repo/00000000-0000-0000-0000-000000000002.jsonl",
+  "cwd": "/home/user/repo",
+  "prompt_id": "11111111-1111-1111-1111-111111111112",
+  "permission_mode": "acceptEdits",
+  "agent_id": "a0000000000000001",
+  "agent_type": "general-purpose",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/home/user/repo/b.txt",
+    "content": "hello\n"
+  },
+  "tool_use_id": "toolu_dummy2"
+}

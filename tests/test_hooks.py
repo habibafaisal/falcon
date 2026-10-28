@@ -63,6 +63,28 @@ def test_main_session_is_never_fenced(tmp_path):
     assert run_hook("protect_paths.py", write(repo, "src/ledger/post.py", agent=False), repo) is None
 
 
+# Real PreToolUse payloads captured from Claude Code (IDs and paths scrubbed). They pin the main-vs-
+# subagent signal to what Claude Code actually sends, not to what the tests above assume it sends.
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+
+def real_payload(name, repo, rel):
+    payload = json.loads((FIXTURES / name).read_text())
+    payload["cwd"] = str(repo)
+    payload["tool_input"]["file_path"] = str(repo / rel)
+    return payload
+
+
+def test_real_subagent_payload_to_protected_path_is_denied(tmp_path):
+    repo = repo_with_fence(tmp_path)
+    assert denied(run_hook("protect_paths.py", real_payload("pretooluse_subagent.json", repo, "src/ledger/post.py"), repo))
+
+
+def test_real_main_session_payload_to_protected_path_is_allowed(tmp_path):
+    repo = repo_with_fence(tmp_path)
+    assert run_hook("protect_paths.py", real_payload("pretooluse_main.json", repo, "src/ledger/post.py"), repo) is None
+
+
 def test_subagent_write_elsewhere_is_allowed(tmp_path):
     repo = repo_with_fence(tmp_path)
     assert run_hook("protect_paths.py", write(repo, "src/ui/page.py"), repo) is None
