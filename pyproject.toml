@@ -2,6 +2,7 @@
 name = "falcon-harness"
 version = "0.1.0"
 description = "A Claude Code harness for codebases where a silent bug is expensive"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = ["pyyaml>=6"]
 

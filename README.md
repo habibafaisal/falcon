@@ -152,3 +152,7 @@ it does is copy those files in.
 ```bash
 uv run --with pytest --with pyyaml pytest
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
